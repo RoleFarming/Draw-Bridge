@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2-dev (9ee32be, 2021-06-19)"
+   sodipodi:docname="button1a.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.64052329"
+     inkscape:cx="-85.867291"
+     inkscape:cy="409.82116"
+     inkscape:window-width="1312"
+     inkscape:window-height="969"
+     inkscape:window-x="1922"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <ellipse
+       style="fill:#ddff55;fill-rule:evenodd;stroke-width:0.33071"
+       id="path31"
+       cx="66.711403"
+       cy="98.311539"
+       rx="38.20932"
+       ry="11.979136" />
+    <path
+       style="fill:#ffeeaa;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.264583"
+       id="path134"
+       d="m 35.889472,103.07004 c 2.184784,-2.99957 5.02789,-5.457677 7.886089,-7.791821 0.704074,-0.474567 1.356801,-1.03605 2.112224,-1.423699 0.358669,-0.184055 -1.29508,0.706454 -0.903825,0.803601 0.759847,0.188666 1.522138,-0.416904 2.304082,-0.455922 2.887152,-0.144074 5.373642,1.144891 7.892957,2.338056 4.105572,2.24554 8.197818,4.534635 12.606697,6.143195 2.805592,1.02361 3.665556,1.16903 6.546604,1.9085 4.103005,0.7968 8.364942,1.44416 12.535567,0.72345 2.307812,-0.39881 3.004775,-0.80003 5.117523,-1.64583 0.639694,-0.35424 1.27939,-0.70847 1.919084,-1.06271 0,0 2.880698,-2.33003 2.880698,-2.33003 v 0 c -0.642596,0.37639 -1.285192,0.75277 -1.927788,1.12916 -2.084999,0.88722 -2.811801,1.32136 -5.097449,1.76057 -4.148394,0.79716 -8.408189,0.16956 -12.505746,-0.58848 -2.756032,-0.69142 -3.854315,-0.89629 -6.541627,-1.85567 -4.404836,-1.572551 -8.476758,-3.862382 -12.53164,-6.162799 -2.516587,-1.245084 -5.046162,-2.621997 -7.954028,-2.575803 -3.757422,0.05969 -6.86284,2.65358 -9.840876,4.658963 -2.931824,2.422604 -5.800968,4.961729 -8.138115,7.982229 0,0 3.639569,-1.55496 3.639569,-1.55496 z" />
+    <path
+       style="fill:#ffe680;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.264583"
+       id="path146"
+       d="m 97.248204,99.210817 c 0.0348,-1.573107 -0.42399,-3.125362 -1.425991,-4.363493 -0.35248,-0.435549 -0.780129,-0.804476 -1.170194,-1.206714 -2.808009,-2.302576 -6.250802,-3.85105 -9.857536,-4.372398 -0.853249,-0.123336 -1.718969,-0.134692 -2.578452,-0.202036 -0.883914,0.04275 -1.774084,0.01492 -2.651744,0.128264 -4.97129,0.641985 -9.5143,3.17137 -13.877507,5.469044 -4.272661,2.374556 -8.60421,4.628702 -13.111662,6.523726 -2.3231,0.84025 -4.653679,1.99225 -7.155619,2.18839 -1.184521,0.0929 -1.739482,-0.0446 -2.897534,-0.2027 -1.447811,-0.25534 -2.583932,-0.98924 -3.751159,-1.82266 0,0 -3.215019,2.03971 -3.215019,2.03971 v 0 c 1.224484,0.90952 2.32378,1.65329 3.853535,1.97589 1.154861,0.18072 1.795769,0.34101 2.982089,0.27776 2.542226,-0.13556 4.910334,-1.31773 7.267059,-2.15572 4.552583,-1.88857 8.918917,-4.161083 13.219057,-6.566347 4.28539,-2.285029 8.869207,-4.868402 13.746811,-5.566428 0.864957,-0.123783 1.744276,-0.106778 2.616411,-0.160169 0.845283,0.05693 1.696363,0.05674 2.535846,0.1708 3.528841,0.479464 6.910814,1.982845 9.646261,4.243154 0.363541,0.388107 0.762895,0.74553 1.090618,1.16432 0.929299,1.187524 1.351333,2.687744 1.177198,4.17687 0,0 3.557532,-1.739263 3.557532,-1.739263 z" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:8.96632px;line-height:1.25;font-family:sans-serif;fill:#2b1100;fill-opacity:1;stroke:none;stroke-width:0.224158"
+       x="49.472404"
+       y="97.419914"
+       id="text3145"
+       transform="scale(0.96403001,1.0373121)"><tspan
+         sodipodi:role="line"
+         id="tspan3143"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.96632px;font-family:'Galiver Sans';-inkscape-font-specification:'Galiver Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#2b1100;stroke-width:0.224158"
+         x="49.472404"
+         y="97.419914">Exchange</tspan></text>
+  </g>
+</svg>
