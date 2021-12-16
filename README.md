@@ -15,7 +15,7 @@
 
 Prerequisites: [Node](https://nodejs.org/en/download/) plus [Yarn](https://classic.yarnpkg.com/en/docs/install/) and [Git](https://git-scm.com/downloads)
 
-> clone/fork 🏗 scaffold-eth:
+> clone/fork Draw-Bridge:
 
 ```bash
 git clone https://github.com/RoleFarming/Draw-Bridge.git
