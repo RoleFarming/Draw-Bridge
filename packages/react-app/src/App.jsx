@@ -34,6 +34,9 @@ import { Home, ExampleUI, Hints, Subgraph } from "./views";
 import { useStaticJsonRPC } from "./hooks";
 
 const { ethers } = require("ethers");
+
+const _sodium = require('libsodium-wrappers');
+
 /*
     Welcome to 🏗 scaffold-eth !
 
@@ -85,6 +88,37 @@ let casper = {
 }
 
 function App(props) {
+
+  (async() => {
+    await _sodium.ready;
+    const sodium = _sodium;
+
+    let keypair = sodium.crypto_box_keypair(); //sodium.crypto_sign_keypair();
+    const sk = sodium.to_hex(keypair.privateKey);
+    const pk = sodium.to_hex(keypair.publicKey);
+    let secretKey = keypair.privateKey//await sodium.crypto_box_secretkey(keypair);
+    let publicKey = keypair.publicKey//await sodium.crypto_box_publickey(keypair);
+
+    let sender = 'AAA'
+    let recipient = 'BBB'
+    let message = 'msg'
+
+//    console.log('Signing Message');
+//    const signature = sodium.to_hex(sodium.crypto_sign_detached(`<${sender} ${recipient} ${message}>`, keypair.privateKey));
+//    console.log(signature)
+
+    const encrypted = sodium.crypto_box_seal(message, publicKey);//keypair.publicKey);
+
+    console.log(sodium.to_hex(encrypted))
+
+    const decrypted = sodium.crypto_box_seal_open(encrypted, publicKey, secretKey)
+
+    const orig = new TextDecoder().decode(decrypted)
+    console.log(decrypted)
+    console.log(orig)
+
+  })();
+  
   // specify all the chains your app is available on. Eg: ['localhost', 'mainnet', ...otherNetworks ]
   // reference './constants.js' for other networks
   const networkOptions = ["localhost", "mainnet", "rinkeby"];
@@ -287,23 +321,89 @@ function App(props) {
 //  dweetPost()
 
   // DWEET ]
+  // CASPER [
 
-  
-//  new Promise((async (t, e) => {
-//  }))
+  const [casperStatus, setCasperStatus] = useState([]);
+  const [casperInterval, setCasperInterval] = useState([]);
 
-  useEffect(async () => {
+  useEffect(() => {
+    if (casperInterval !== 'inited') {
+      setInterval(
+        async () => {
+        let casper = {
+          connected: false,
+          publicKey: ''
+        }
+        try {
+          console.log('Casper state update')
+          casper.connected = await window.casperlabsHelper.isConnected()
+          casper.publicKey = (casper.connected) ?
+            await window.casperlabsHelper.getActivePublicKey() : ''
+          
+          setCasperStatus(JSON.stringify(casper))
+        }
+        catch (e) {
+          console.log('Error ', e)
+          setCasperStatus(JSON.stringify(casper))
+        }
+      }, 500);
+      const interval = 'inited'
+      setCasperInterval(interval)
+    }
+
+  });
+
+  if (typeof casperStatus === 'string') {
+    casper = JSON.parse(casperStatus)
+  }
+
+  async function casperDisconnect() {
     try {
-      casper.connected = await window.casperlabsHelper.isConnected()
-      if (casper.connected) {
-        casper.publicKey = await window.casperlabsHelper.getActivePublicKey();
+      console.log('Casper disconnect')
+      casper.connected = false
+      casper.publicKey = ''
+      window.casperlabsHelper.disconnectFromSite();
+    }
+    catch (e) {
+      console.log('Error ', e)
+    }
+  }
+
+  async function casperConnect() {
+    console.log('Casper connect')
+
+    try {
+      await window.casperlabsHelper.requestConnection();
+/*
+      const isConnected = await window.casperlabsHelper.isConnected()
+      if (isConnected) {
+        const publicKey = await window.casperlabsHelper.getActivePublicKey();
+        //textAddress.textContent += publicKey;
+
+        const latestBlock = await casperService.getLatestBlockInfo();
+        const root = await casperService.getStateRootHash(latestBlock.block.hash);
+
+        const balanceUref = await casperService.getAccountBalanceUrefByPublicKey(
+                root,
+                CLPublicKey.fromHex(publicKey)
+                )
+
+        //account balance from the last block
+        const balance = await casperService.getAccountBalance(
+                latestBlock.block.header.state_root_hash,
+                balanceUref
+        );
+      // textBalance.textContent = `PublicKeyHex ${balance.toString()}`;
+
       }
-      }
-      catch (e) {
-        casper.connected = false
-        console.log('Error ', e)
-      }
-    })
+*/
+    }
+    catch (e) {
+      console.log('Error ', e)
+    }
+  }
+  
+  // CASPER ]
 
   //
   // 🧫 DEBUG 👨🏻‍🔬
@@ -502,45 +602,7 @@ function App(props) {
       <Row justify="center">
         <Col span={10} >
           <Button
-            onClick={async () => { 
-              console.log('Casper connect')
-
-              try {
-                await window.casperlabsHelper.requestConnection();
-
-                casper.connected = await window.casperlabsHelper.isConnected()
-                if (casper.connected) {
-                  casper.publicKey = await window.casperlabsHelper.getActivePublicKey();
-                }
-
-                const isConnected = await window.casperlabsHelper.isConnected()
-                if (isConnected) {
-                  const publicKey = await window.casperlabsHelper.getActivePublicKey();
-                  //textAddress.textContent += publicKey;
-      
-                  const latestBlock = await casperService.getLatestBlockInfo();
-                  const root = await casperService.getStateRootHash(latestBlock.block.hash);
-      
-                  const balanceUref = await casperService.getAccountBalanceUrefByPublicKey(
-                          root,
-                          CLPublicKey.fromHex(publicKey)
-                          )
-      
-                  //account balance from the last block
-                  const balance = await casperService.getAccountBalance(
-                          latestBlock.block.header.state_root_hash,
-                          balanceUref
-                  );
-                // textBalance.textContent = `PublicKeyHex ${balance.toString()}`;
-      
-                }
-      
-              }
-              catch (e) {
-                casper.connected = false
-                console.log('Error ', e)
-              }
-            }}
+            onClick={casperConnect} 
             size="large"
             shape="round"
           >
@@ -550,10 +612,7 @@ function App(props) {
       </Row>
 
       <Button
-        onClick={async () => { 
-          console.log('Casper disconnect')
-          window.casperlabsHelper.disconnectFromSite();
-        }}
+        onClick={casperDisconnect}
         size="large"
         shape="round"
       >
