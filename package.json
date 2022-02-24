@@ -9,6 +9,7 @@
     "yarn"
   ],
   "private": true,
+  "proxy": "http://138.201.54.44:7777/rpc",
   "scripts": {
     "react-app:build": "yarn workspace @scaffold-eth/react-app build --max-old-space-size=12288",
     "react-app:eject": "yarn workspace @scaffold-eth/react-app eject",
@@ -67,8 +68,11 @@
     ]
   },
   "dependencies": {
+    "@lapo/asn1js": "^1.2.3",
+    "casper-erc20-js-client": "^0.0.5",
     "casper-js-sdk": "^2.7.3",
-    "libsodium-wrappers": "^0.7.9"
+    "libsodium-wrappers": "^0.7.9",
+    "tweetnacl-ts": "^1.0.3"
   },
   "devDependencies": {
     "husky": "^7.0.2"

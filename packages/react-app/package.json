@@ -14,6 +14,8 @@
       "last 1 safari version"
     ]
   },
+  "proxy": "http://138.201.54.44:7777/rpc",
+
   "dependencies": {
     "@ant-design/icons": "^4.2.2",
     "@apollo/client": "^3.3.21",
