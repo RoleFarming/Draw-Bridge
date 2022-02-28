@@ -29,22 +29,45 @@ yarn install
 yarn chain
 ```
 
-> in a second terminal window, start your 📱 frontend:
-
-```bash
-cd Draw-Bridge
-yarn start
-```
-
-> in a third terminal window, 🛰 deploy your contract:
+> 🛰 deploy your contract:
 
 ```bash
 cd Draw-Bridge
 yarn deploy
 ```
 
+> configure variables
+
+```javascript
+const Supervisor = "<supervisor> // supervisor casper address for manage transfers
+const CHAIN_NAME = "casper-test" // cspr chain name
+const contractRFBTC = "<contract_address>" // eth contract address for rfbtc
+const NODE_ADDRESS="http://138.201.54.44:7777/rpc" // cspr node address
+const EVENT_STREAM_ADDRESS="http://138.201.54.44:9999/events/main" // cspr event stream
+const RFBTC_CONTRACT_HASH = '<contract_address>' // eth contract address for rfbtc
+```
+
+> start your 📱 frontend:
+
+```bash
+cd Draw-Bridge
+yarn start
+```
+
 🌍 You need an RPC key for production deployments/Apps, create an [Alchemy](https://www.alchemy.com/) account and replace the value of `ALCHEMY_KEY = xxx` in `packages/react-app/src/constants.js`
 
 📱 Open http://localhost:3000 to see the app
 
-
+> Testing
+```
+1. Connect Metamask
+2. Connect Casper Signer
+3. Grab ETH Faucet (for testent)
+4. Grab CSPR Faucet (for testent) 
+5. Enter amount
+6. Push Exchane
+7. If you are Supervisor:
+7.1 enter CSPR privkey for order processing
+7.2 Verify tx and push Approve
+7.3 Push Cancel if not sure and back ETH manually
+```

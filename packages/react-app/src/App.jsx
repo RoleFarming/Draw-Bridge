@@ -74,37 +74,6 @@ let casper = {
 
 function App(props) {
 
-  (async() => {
-
-    await _sodium.ready;
-    const sodium = _sodium;
-
-    let keypair = sodium.crypto_box_keypair(); //sodium.crypto_sign_keypair();
-    const sk = sodium.to_hex(keypair.privateKey);
-    const pk = sodium.to_hex(keypair.publicKey);
-    let secretKey = keypair.privateKey//await sodium.crypto_box_secretkey(keypair);
-    let publicKey = keypair.publicKey//await sodium.crypto_box_publickey(keypair);
-
-    let sender = 'AAA'
-    let recipient = 'BBB'
-    let message = 'msg'
-
-//    console.log('Signing Message');
-//    const signature = sodium.to_hex(sodium.crypto_sign_detached(`<${sender} ${recipient} ${message}>`, keypair.privateKey));
-//    console.log(signature)
-
-    const encrypted = sodium.crypto_box_seal(message, publicKey);//keypair.publicKey);
-
-    console.log(sodium.to_hex(encrypted))
-
-    const decrypted = sodium.crypto_box_seal_open(encrypted, publicKey, secretKey)
-
-    const orig = new TextDecoder().decode(decrypted)
-    console.log(decrypted)
-    console.log(orig)
-
-  })();
-  
   // specify all the chains your app is available on. Eg: ['localhost', 'mainnet', ...otherNetworks ]
   // reference './constants.js' for other networks
   const networkOptions = ["localhost", "mainnet", "rinkeby"];
@@ -274,51 +243,6 @@ function App(props) {
   // COIN ]
 
   // ###############
-  // #####  2  #####
-  // ###############
-
-  // IPFS [
-
-  // IPFS for fast sync with clients
-
-  const ipfsAPI = require("ipfs-http-client");
-
-  console.log('ipfsAPI', ipfsAPI)
-  const infura = { host: "ipfs.infura.io", port: "5001", protocol: "https" };
-  const ipfs = ipfsAPI(infura);
-
-  new Promise((async (t, e) => {
-//    let files = await ipfs.files.ls('/examples')
-//    console.log('files', files)
-
-    // example obj
-//    const obj = {
-//      a: 1,
-//      b: [1, 2, 3],
-//      c: {
-//        ca: [5, 6, 7],
-//        cb: 'foo'
-//      }
-//    }
-
-//    const cid = '/ipfs/Qmfoo'
-//    const updatedCid = await ipfs.object.patch.setData(cid, new TextEncoder().encode('more data'))
-
-//    const cid = await ipfs.dag.put(obj, { format: 'dag-cbor', hashAlg: 'sha2-256' })
-//    console.log(cid.toString())
-
-//    for await (const file of ipfs.files.ls('/screenshots')) {
-//      console.log(file.name)
-//    }
-    
-//    let dir = await ipfs.files.mkdir('/draw-bridge-requests-0101011')
-//    console.log(dir)
-    t()
-  }))
-
-  // IPFS ]
-
-  // ###############
   // #####  3  #####
   // ###############
 
@@ -408,29 +332,6 @@ function App(props) {
 
     try {
       await window.casperlabsHelper.requestConnection();
-/*
-      const isConnected = await window.casperlabsHelper.isConnected()
-      if (isConnected) {
-        const publicKey = await window.casperlabsHelper.getActivePublicKey();
-        //textAddress.textContent += publicKey;
-
-        const latestBlock = await casperService.getLatestBlockInfo();
-        const root = await casperService.getStateRootHash(latestBlock.block.hash);
-
-        const balanceUref = await casperService.getAccountBalanceUrefByPublicKey(
-                root,
-                CLPublicKey.fromHex(publicKey)
-                )
-
-        //account balance from the last block
-        const balance = await casperService.getAccountBalance(
-                latestBlock.block.header.state_root_hash,
-                balanceUref
-        );
-      // textBalance.textContent = `PublicKeyHex ${balance.toString()}`;
-
-      }
-*/
     }
     catch (e) {
       console.log('Error ', e)
@@ -538,11 +439,11 @@ function App(props) {
   // DROPDOWN MENU [
   
   const handleMenuClick = function handleMenuClick(e) {
-    message.info('Change currency');
-
-//    let selected = e.key
-
     const location = JSON.parse(e.key)
+
+    // check multicurrency RFBTC, RFBTCe, RFUNISWAP
+    if (location.length < 3)
+      return
 
     let coinIndex = location[1]
     let selected = coinsDef[coinIndex].symbol
@@ -565,19 +466,15 @@ function App(props) {
 
     setSelectedCoinLeft(coin[0])
     setSelectedCoinRight(coin[1])
-  }
 
-  //icon={<EthIcon />} 
-  //icon={<RfBtcIcon />}
+    message.info('Change currency');
+  }
 
   function menuCrypto(i) {
     return (
       <Menu onClick={handleMenuClick}>
         <Menu.Item key={JSON.stringify([i, 0])} >
-          {coinsDef[0].symbol}
-        </Menu.Item>
-        <Menu.Item key={JSON.stringify([i, 1])}>
-          {coinsDef[1].symbol}
+          {coinsDef[i].symbol}
         </Menu.Item>
       </Menu>
     );
@@ -630,20 +527,7 @@ function App(props) {
         });
 
         // send amount eth ]
-
-//      ethAddOrder(ethAddress, csprAddress, order.amountValue, reverse, txExchangeId);
     }
-  }
-
-  const orderRemove = function orderRemove() {
-    
-  }
-
-  const orderApprove = function orderApprove() {
-    
-  }
-
-  const orderList = function orderList() {
   }
 
   function orderDecode(o) {
@@ -724,7 +608,6 @@ function App(props) {
     // make invoice
     // send invoice
 
-
     orderAdd(o)
   }
 
@@ -765,13 +648,9 @@ function App(props) {
 
   function csprAddressDisplay(str) {
     var middle = Math.ceil(str.length / 2);
-//    var q = middle / 2;
-    var q = middle ;
+    var q = middle;
     var s1 = str.slice(0, q);
     var s2 = str.slice(q, q*2);
-//    var s3 = str.slice(q*2, q*3);
-//    var s4 = str.slice(q*3);
-//    return <div> <div>{s1}</div><div>{s2}</div><div>{s3}</div><div>{s4}</div> </div>;
     return <div> <div>{s1}</div><div>{s2}</div> </div>;
   }
 
@@ -808,39 +687,15 @@ function App(props) {
         selectedChainId={selectedChainId}
         targetNetwork={targetNetwork}
       /> 
-{/*
-      <Menu style={{ textAlign: "center" }} selectedKeys={[location.pathname]} mode="horizontal">
-        <Menu.Item key="/">
-          <Link to="/">App Home</Link>
-        </Menu.Item>
-        <Menu.Item key="/debug">
-          <Link to="/debug">Debug Contracts</Link>
-        </Menu.Item>
-        <Menu.Item key="/hints">
-          <Link to="/hints">Hints</Link>
-        </Menu.Item>
-        <Menu.Item key="/exampleui">
-          <Link to="/exampleui">ExampleUI</Link>
-        </Menu.Item>
-        <Menu.Item key="/mainnetdai">
-          <Link to="/mainnetdai">Mainnet DAI</Link>
-        </Menu.Item>
-        <Menu.Item key="/subgraph">
-          <Link to="/subgraph">Subgraph</Link>
-        </Menu.Item>
-      </Menu>
- */}
 
       <Divider orientation="left">Wallets Connection</Divider>
 
   {/* 
-
   // ###############
   // #####  9  #####
   // ###############
 
   // CONNECT BLOCK [
-    
   */}
 
       <Row justify="center">
@@ -878,57 +733,22 @@ function App(props) {
       </Button>
 
 {/*
-
   // CONNECT BLOCK ]
-
 */}
 
 {/*
-
   // ################
   // #####  10  #####
   // ################
-
 */}
 
 {/*
-      <div>
-        - client or admin user - isAdmin()
-        - client send(address_admin, eth_amount) -> txid, casper_address
-        - admin timer check if txid approved 1 times then
-        - admin send(casper_addres, casper_amount)
-      </div>
-*/}
 {/*
-      <Dropdown.Button overlay={menuCrypto} placement="bottomRight" trigger={["click"]}>
-        <span style={{ textTransform: "capitalize" }}>{selectedCoinLeft}</span>
-      </Dropdown.Button>
-      
-      <InputNumber
-        style={{
-          width: 200,
-        }}
-        defaultValue="1"
-        min="0"
-        max="1000000000"
-        step="0.01"
-        onChange={onChangeTransferValue}
-        stringMode
-      />
-
-      <Dropdown.Button overlay={menuCrypto} placement="bottomRight" trigger={["click"]}>
-        <span style={{ textTransform: "capitalize" }}>{selectedCoinRight}</span>
-      </Dropdown.Button>
-*/}
-
-{/*
-
   // ################
   // #####  11  #####
   // ################
 
   // ORDER [
-
 */}
 
       <Divider orientation="left">Order Details</Divider>
@@ -1022,21 +842,6 @@ function App(props) {
         : undefined
       }
       <Divider orientation="left"></Divider>
-{/*
-      <Row justify="center">
-        <Col span={5}>
-          Casper Validator Address
-        </Col>
-        <Col span={10}>
-          <Input placeholder="address"/>
-        </Col>
-        <Col span={2}>
-        </Col>
-        <Col span={4}>
-        Casper network validator address if you knows
-        </Col>
-      </Row>
-*/}
       <Row justify="center">
         <Col span={5}>
           Casper Balance
@@ -1078,7 +883,6 @@ function App(props) {
       </Row>
 
 {/*
-
   // ORDER ]
 
   // ################
@@ -1086,7 +890,6 @@ function App(props) {
   // ################
 
   // ORDERS LIST [
-
 */}
 
       <Divider orientation="left">Orders</Divider>
@@ -1173,7 +976,6 @@ function App(props) {
   })
 }
 {/*
-
   // ORDER ]
 
   // ################
@@ -1181,7 +983,6 @@ function App(props) {
   // ################
 
   // ORDERS HISTORY [
-
 */}
 
       <Divider orientation="left">Orders History</Divider>
@@ -1215,77 +1016,6 @@ function App(props) {
 
       <Switch>
         <Route exact path="/">
-          {/* pass in any web3 props to this Home component. For example, yourLocalBalance */}
-          {/*<Home yourLocalBalance={yourLocalBalance} readContracts={readContracts} />*/} 
-        </Route>
-        <Route exact path="/debug">
-          {/*
-                🎛 this scaffolding is full of commonly used components
-                this <Contract/> component will automatically parse your ABI
-                and give you a form to interact with it locally
-            */}
-
-          <Contract
-            name="YourContract"
-            price={price}
-            signer={userSigner}
-            provider={localProvider}
-            address={address}
-            blockExplorer={blockExplorer}
-            contractConfig={contractConfig}
-          />
-        </Route>
-        <Route path="/hints">
-          <Hints
-            address={address}
-            yourLocalBalance={yourLocalBalance}
-            mainnetProvider={mainnetProvider}
-            price={price}
-          />
-        </Route>
-        <Route path="/exampleui">
-          <ExampleUI
-            address={address}
-            userSigner={userSigner}
-            mainnetProvider={mainnetProvider}
-            localProvider={localProvider}
-            yourLocalBalance={yourLocalBalance}
-            price={price}
-            tx={tx}
-            writeContracts={writeContracts}
-            readContracts={readContracts}
-            purpose={purpose}
-          />
-        </Route>
-        <Route path="/mainnetdai">
-          <Contract
-            name="DAI"
-            customContract={mainnetContracts && mainnetContracts.contracts && mainnetContracts.contracts.DAI}
-            signer={userSigner}
-            provider={mainnetProvider}
-            address={address}
-            blockExplorer="https://etherscan.io/"
-            contractConfig={contractConfig}
-            chainId={1}
-          />
-          {/*
-            <Contract
-              name="UNI"
-              customContract={mainnetContracts && mainnetContracts.contracts && mainnetContracts.contracts.UNI}
-              signer={userSigner}
-              provider={mainnetProvider}
-              address={address}
-              blockExplorer="https://etherscan.io/"
-            />
-            */}
-        </Route>
-        <Route path="/subgraph">
-          <Subgraph
-            subgraphUri={props.subgraphUri}
-            tx={tx}
-            writeContracts={writeContracts}
-            mainnetProvider={mainnetProvider}
-          />
         </Route>
       </Switch>
 
@@ -1315,71 +1045,6 @@ function App(props) {
         </div>
         <FaucetHint localProvider={localProvider} targetNetwork={targetNetwork} address={address} />
       </div>
-{/*
-      <Button
-          onClick={() => {
-            tx(writeContracts.YourContract.setPurpose("🍻 Cheers"));
-          }}
-        >
-          &quot;🍻 Cheers&quot;
-        </Button>
-
-        <Button
-          onClick={() => {
-            let cspr = {
-              a: BigNumber.from(0),
-              b: BigNumber.from(0),
-              c: '0x123'
-            }
-
-            let amount = 1.0;
-            const value = ethers.utils.parseEther("" + amount);
-
-            tx(writeContracts.YourContract.addOrder(address, cspr.a,cspr.b,cspr.c, value, false));
-          }}
-        >
-          &quot;🍻 Cheers&quot;
-        </Button>
- */}
-      {/* 🗺 Extra UI like gas price, eth price, faucet, and support: 
-      <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
-        <Row align="middle" gutter={[4, 4]}>
-          <Col span={8}>
-            <Ramp price={price} address={address} networks={NETWORKS} />
-          </Col>
-
-          <Col span={8} style={{ textAlign: "center", opacity: 0.8 }}>
-            <GasGauge gasPrice={gasPrice} />
-          </Col>
-          <Col span={8} style={{ textAlign: "center", opacity: 1 }}>
-            <Button
-              onClick={() => {
-                window.open("https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA");
-              }}
-              size="large"
-              shape="round"
-            >
-              <span style={{ marginRight: 8 }} role="img" aria-label="support">
-                💬
-              </span>
-              Support
-            </Button>
-          </Col>
-        </Row>
-
-        <Row align="middle" gutter={[4, 4]}>
-          <Col span={24}>
-            {
-              //  if the local provider has a signer, let's show the faucet:  
-              faucetAvailable ? (
-                <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
-              ) : (
-                ""
-              )
-            }
-          </Col>
-        </Row>
-      </div>*/}
     </div>
   );
 }
