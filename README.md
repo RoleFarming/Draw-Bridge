@@ -71,3 +71,20 @@ yarn start
 7.2 Verify tx and push Approve
 7.3 Push Cancel if not sure and back ETH manually
 ```
+
+
+## Contribution
+
+Thank you for considering to help out with the source code! We welcome contributions
+from anyone on the internet, and are grateful for even the smallest of fixes!
+
+If you'd like to contribute to Draw-Bridge, please fork, fix, commit and send a pull request
+for the maintainers to review and merge into the main code base. 
+
+See common Casper Labs contributor guidlines
+
+https://github.com/make-software/how-to-casperlabs/blob/master/CONTRIBUTING.md
+
+## License
+The Draw-Bridge is licensed under the Apache License Version 2.0, also included in our repository in the LICENSE file.
+

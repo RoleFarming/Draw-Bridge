@@ -25,7 +25,7 @@ import {
   FaucetHint,
   NetworkSwitch,
 } from "./components";
-import { NETWORKS, ALCHEMY_KEY } from "./constants";
+import { NETWORKS, ALCHEMY_KEY, SUPERVISOR, CASPER_RFBTC_CONTRACT_HASH } from "./constants";
 import externalContracts from "./contracts/external_contracts";
 // contracts
 import deployedContracts from "./contracts/hardhat_contracts.json";
@@ -37,15 +37,14 @@ const { BigNumber } = require("ethers");
 
 const { ethers } = require("ethers");
 
-const _sodium = require('libsodium-wrappers');
+const _sodium = require("libsodium-wrappers");
 
-import {CasperClient,CasperServiceByJsonRPC, CLPublicKey,DeployUtil } from "casper-js-sdk";
+import { CasperClient, CasperServiceByJsonRPC, CLPublicKey, DeployUtil } from "casper-js-sdk";
 
 //Create Casper client and service to interact with Casper node.
-const apiUrl = 'http://65.21.111.173:7777/rpc';
+const apiUrl = "http://65.21.111.173:7777/rpc";
 const casperService = new CasperServiceByJsonRPC(apiUrl);
 const casperClient = new CasperClient(apiUrl);
-
 
 /// 📡 What chain are your contracts deployed to?
 const targetNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
@@ -67,13 +66,12 @@ const providers = [
 
 let casper = {
   connected: false,
-  publicKey: ''
-}
+  publicKey: "",
+};
 
 // CASPER 0 ]
 
 function App(props) {
-
   // specify all the chains your app is available on. Eg: ['localhost', 'mainnet', ...otherNetworks ]
   // reference './constants.js' for other networks
   const networkOptions = ["localhost", "mainnet", "rinkeby"];
@@ -119,15 +117,28 @@ function App(props) {
   const userProviderAndSigner = useUserProviderAndSigner(injectedProvider, localProvider);
   const userSigner = userProviderAndSigner.signer;
 
-  useEffect(() => {
-    async function getAddress() {
-      if (userSigner) {
-        const newAddress = await userSigner.getAddress();
-        setAddress(newAddress);
-      }
+  const updateAddressMetamask = async () => {
+    if (injectedProvider) {
+      const accounts = await injectedProvider.listAccounts();
+      const newAddress = accounts[0];
+      setAddress(newAddress);
+      return true;
     }
-    getAddress();
-  }, [userSigner]);
+    return false;
+  };
+
+  const updateAddress = async () => {
+    if (await updateAddressMetamask()) {
+      return;
+    }
+    if (userSigner) {
+      const newAddress = await userSigner.getAddress();
+      console.log(`set userSigner newAddress ${newAddress}`);
+      setAddress(newAddress);
+    }
+  };
+
+  updateAddress();
 
   // You can warn the user if you would like them to be on a specific network
   const localChainId = localProvider && localProvider._network && localProvider._network.chainId;
@@ -154,6 +165,9 @@ function App(props) {
 
   // If you want to make 🔐 write transactions to your contracts, use the userSigner:
   const writeContracts = useContractLoader(userSigner, contractConfig, localChainId);
+  
+
+//  writeContracts && writeContracts.YourContract && writeContracts.YourContract.setPurpose("🍻 Cheers");
 
   // EXTERNAL CONTRACT EXAMPLE:
   //
@@ -169,76 +183,80 @@ function App(props) {
   const myMainnetDAIBalance = useContractReader(mainnetContracts, "DAI", "balanceOf", [
     "0x34aA3F359A9D614239015126635CE7732c18fDF3",
   ]);
-
   // keep track of a variable from the contract in the local React state:
   const purpose = useContractReader(readContracts, "YourContract", "purpose");
 
   const orders = useContractReader(readContracts, "YourContract", "getOrders");
 
-  console.log('purpose', purpose)
-  console.log('orders', orders)
+  console.log("purpose", purpose);
+  console.log("orders", orders);
 
-  const ethContractError = !Array.isArray(orders)
+  const ethContractError = !Array.isArray(orders);
+
   // ###############
   // #####  1  #####
   // ###############
 
   // SUPERVISOR [
 
-  const Supervisor = '0xdcEf1fA54EeEa589429B6E9D3F57F2081FDA7BeE'
+  const Supervisor = SUPERVISOR;
 
   // SUPERVISOR ]
   // COIN [
 
   function tornEthereum() {
     return {
-      blockchain: 'Ethereum',
-      symbol: 'ETH',
+      blockchain: "Ethereum",
+      symbol: "ETH",
       price: 1,
       connected: true,
-      address: address
-    }
+      address: address,
+    };
   }
 
   function tornCasper() {
     return {
-      blockchain: 'Casper',
-      symbol: 'RFBTC',
+      blockchain: "Casper",
+      symbol: "RFBTC",
       price: 2,
       connected: casper.connected,
-      address: casper.connected ? casper.publicKey : <div>
-          <Button type="link" onClick={casperConnect} >Connect Casper Signer</Button>
+      address: casper.connected ? (
+        casper.publicKey
+      ) : (
+        <div>
+          <Button type="link" onClick={casperConnect}>
+            Connect Casper Signer
+          </Button>
         </div>
-    }
+      ),
+    };
   }
 
   const coinsDef = [
     {
       index: 0,
-      symbol: 'ETH',
-      torn: tornEthereum
+      symbol: "ETH",
+      torn: tornEthereum,
     },
     {
       index: 1,
-      symbol: 'RFBTC',
-      torn: tornCasper
-    }
-  ]
-
+      symbol: "RFBTC",
+      torn: tornCasper,
+    },
+  ];
 
   function coinBySymbol(symbol) {
-    return coinsDef.find(i => i.symbol == symbol)
+    return coinsDef.find(i => i.symbol == symbol);
   }
 
-
-  const [ selectedCoinLeft, setSelectedCoinLeft ] = useState('ETH')
-  const [ selectedCoinRight, setSelectedCoinRight ] = useState('RFBTC')
+  const [selectedCoinLeft, setSelectedCoinLeft] = useState("ETH");
+  const [selectedCoinRight, setSelectedCoinRight] = useState("RFBTC");
 
   let coinsExchange = [
     // default ETH -> RFBTC
     coinBySymbol(selectedCoinLeft),
-    coinBySymbol(selectedCoinRight)
-  ]
+    coinBySymbol(selectedCoinRight),
+  ];
 
   // COIN ]
 
@@ -253,91 +271,84 @@ function App(props) {
   const [csprSymbol, setCsprSymbol] = useState([]);
 
   const handleChangePrivKey = function handleChangePrivKey(e) {
-    setCsprPrivKey(e.target.value)
-  }
+    setCsprPrivKey(e.target.value);
+  };
   async function getRFBTCBalance() {
-    const contractRFBTC = '55ee24b578546688dfd0f3026cd5f8c2208f332b76b8017b75a62c6e0981b61b'
-    const rfbtcOwner = casper.publicKey
+    const contractRFBTC = CASPER_RFBTC_CONTRACT_HASH;
+    const rfbtcOwner = casper.publicKey;
 
-    if (rfbtcOwner == "")
-      return
-
-    const def = await CasperHelper.getContractArtifacts(contractRFBTC, rfbtcOwner)
- 
-    if (def.err) {
-      console.error(def)
+    if (rfbtcOwner == "") {
       return;
     }
-    
-    setCsprBalance(def.balance)
-    setCsprSymbol(def.symbol)
-  }
 
-  useEffect(async () => {
-  }, []);
+    const def = await CasperHelper.getContractArtifacts(contractRFBTC, rfbtcOwner);
+
+    if (def.err) {
+      console.error(def);
+      return;
+    }
+
+    setCsprBalance(def.balance);
+    setCsprSymbol(def.symbol);
+  }
 
   const [casperStatus, setCasperStatus] = useState([]);
   const [casperInterval, setCasperInterval] = useState([]);
 
   useEffect(() => {
-    if (casperInterval !== 'inited') {
-      const interval = 'inited'
-      setCasperInterval(interval)
+    if (casperInterval !== "inited") {
+      const interval = "inited";
+      setCasperInterval(interval);
 
-      setInterval(
-        async () => {
+      setInterval(async () => {
         let casper = {
           connected: false,
-          publicKey: ''
-        }
+          publicKey: "",
+        };
         try {
-//          console.log('Casper state update')
-          casper.connected = await window.casperlabsHelper.isConnected()
+          // console.log('Casper state update')
+          casper.connected = await window.casperlabsHelper.isConnected();
           casper.publicKey = (casper.connected) ?
-          await window.casperlabsHelper.getActivePublicKey() : ''
-          
-          setCasperStatus(JSON.stringify(casper))
-        }
-        catch (e) {
-//          console.log('Error ', e)
+          await window.casperlabsHelper.getActivePublicKey() : '';
+
+          setCasperStatus(JSON.stringify(casper));
+        } catch (e) {
+          // console.log('Error ', e)
           // Casper is not connected
           casper.connected = false;
-          setCasperStatus(JSON.stringify(casper))
+          setCasperStatus(JSON.stringify(casper));
         }
 
-        await getRFBTCBalance()
+        await getRFBTCBalance();
       }, 1000);
     }
-
   });
 
-  if (typeof casperStatus === 'string') {
-    casper = JSON.parse(casperStatus)
+  if (typeof casperStatus === "string") {
+    casper = JSON.parse(casperStatus);
   }
 
   async function casperDisconnect() {
     try {
-      console.log('Casper disconnect')
-      casper.connected = false
-      casper.publicKey = ''
+      console.log("Casper disconnect");
+      casper.connected = false;
+      casper.publicKey = "";
       window.casperlabsHelper.disconnectFromSite();
-    }
-    catch (e) {
-      console.log('Error ', e)
+    } catch (e) {
+      console.log("Error ", e);
     }
   }
 
   async function casperConnect() {
-    console.log('Casper connect')
+    console.log("Casper connect");
 
     try {
       await window.casperlabsHelper.requestConnection();
-    }
-    catch (e) {
-      console.log('Error ', e)
+    } catch (e) {
+      console.log("Error ", e);
     }
   }
-  
+
   // CASPER WALLET ]
 
   // ###############
@@ -368,7 +379,6 @@ function App(props) {
       console.log("💵 yourMainnetBalance", yourMainnetBalance ? ethers.utils.formatEther(yourMainnetBalance) : "...");
       console.log("📝 readContracts", readContracts);
       console.log("🌍 DAI contract on mainnet:", mainnetContracts);
-      console.log("💵 yourMainnetDAIBalance", myMainnetDAIBalance);
       console.log("🔐 writeContracts", writeContracts);
     }
   }, [
@@ -411,7 +421,6 @@ function App(props) {
 
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
-
   // ###############
   // #####  5  #####
   // ###############
@@ -428,47 +437,47 @@ function App(props) {
 
   // INPUT VALUE [
 
-  const [ amountValue, setAmountValue ] = useState(1.0)
+  const [amountValue, setAmountValue] = useState(1.0);
 
   const onChangeTransferValue = function onChangeTransferValue(e) {
-    let v = parseFloat(e)
-    setAmountValue(isNaN(v) ? 0 : v)
-  }
-  
+    let v = parseFloat(e);
+    setAmountValue(isNaN(v) ? 0 : v);
+  };
+
   // INPUT VALUE ]
   // DROPDOWN MENU [
-  
+
   const handleMenuClick = function handleMenuClick(e) {
-    const location = JSON.parse(e.key)
+    const location = JSON.parse(e.key);
 
     // check multicurrency RFBTC, RFBTCe, RFUNISWAP
-    if (location.length < 3)
-      return
+    if (location.length < 3) {
+      return;
+    }
 
-    let coinIndex = location[1]
-    let selected = coinsDef[coinIndex].symbol
+    let coinIndex = location[1];
+    let selected = coinsDef[coinIndex].symbol;
 
-    let index0 = location[0]
-    let index1 = index0 ^ 1
+    let index0 = location[0];
+    let index1 = index0 ^ 1;
 
-
-    let coin = [selectedCoinLeft, selectedCoinRight]
+    let coin = [selectedCoinLeft, selectedCoinRight];
 
     if (coin[index0] == selected) {
-      return
+      return;
     }
 
     if (coin[index1] == selected) {
-      coin[index1] = coin[index0]
+      coin[index1] = coin[index0];
     }
 
-    coin[index0] = coinBySymbol(selected).symbol
+    coin[index0] = coinBySymbol(selected).symbol;
 
-    setSelectedCoinLeft(coin[0])
-    setSelectedCoinRight(coin[1])
+    setSelectedCoinLeft(coin[0]);
+    setSelectedCoinRight(coin[1]);
 
-    message.info('Change currency');
-  }
+    message.info("Change currency");
+  };
 
   function menuCrypto(i) {
     return (
@@ -486,59 +495,53 @@ function App(props) {
   // #####  6  #####
   // ###############
 
-  let coinLeft = coinsExchange[0].torn()
-  let coinRight = coinsExchange[1].torn()
+  let coinLeft = coinsExchange[0].torn();
+  let coinRight = coinsExchange[1].torn();
 
   // ORDERS [
 
-  let contractBlockchain = 'eth'
+  let contractBlockchain = "eth";
 
   const orderAdd = async function orderAdd(order) {
-
     let reverse = !!order.coinLeft.blockchain == "Ethereum";
 
     let ethAddress = !reverse ? order.coinLeft.address : order.coinRight.address;
     let csprAddress = !reverse ? order.coinRight.address : order.coinLeft.address;
 
-    if (contractBlockchain == 'eth') {
-
+    if (contractBlockchain == "eth") {
       // send amount eth [
 
       let value;
       try {
         value = ethers.utils.parseEther("" + amountValue);
       } catch (e) {
-        message.error(`parse value error ${amountValue}`)
-        return
+        message.error(`parse value error ${amountValue}`);
+        return;
       }
-  
-      await tx({
-        to: Supervisor,
+
+      await tx({to: Supervisor,
         value,
       }, (res) => {
-        console.log(res)
+        console.log(res);
         if (res && res.transactionHash) {
-          let txExchangeId = res.transactionHash
-          message.info(`tx hash ${txExchangeId}, connecting to casper...`)
+          let txExchangeId = res.transactionHash;
+          message.info(`tx hash ${txExchangeId}, connecting to casper...`);
           ethAddOrder(ethAddress, csprAddress, order.amountValue, reverse, txExchangeId);
         }
         else 
-          message.error(`can't send tx to supervisor ${res}`)
-        });
+          message.error(`can't send tx to supervisor ${res}`);
+      });
 
-        // send amount eth ]
+      // send amount eth ]
     }
-  }
+  };
 
   function orderDecode(o) {
     function orderStatusString(status) {
-      if (status == 0)
-        return "PENDING"
-      if (status == 1)
-        return "PAID"
-      if (status == 2)
-        return "CANCELED"
-      return "bad value"
+      if (status == 0) return "PENDING";
+      if (status == 1) return "PAID";
+      if (status == 2) return "CANCELED";
+      return "bad value";
     }
     let order = {
       eth: o[0],
@@ -547,10 +550,10 @@ function App(props) {
       reverse: o[3],
       status: orderStatusString(o[4]),
       ethTxId: o[5],
-      txId: o[6]
+      txId: o[6],
     };
-    order.addressLeft = order.reverse ? order.cspr : order.eth; 
-    order.addressRight = !order.reverse ? order.cspr : order.eth; 
+    order.addressLeft = order.reverse ? order.cspr : order.eth;
+    order.addressRight = !order.reverse ? order.cspr : order.eth;
     return order;
   }
 
@@ -558,8 +561,8 @@ function App(props) {
     let cspr = {
       a: BigNumber.from(0),
       b: BigNumber.from(0),
-      c: "" + csprAddress
-    }
+      c: "" + csprAddress,
+    };
 
 //    let amount = 1.0;
     const value = ethers.utils.parseEther("" + amount);
@@ -577,38 +580,38 @@ function App(props) {
   // HANDLE EXCHANGE ORDER [
 
   function handleTransferClick(e) {
-    console.log(e)
+    console.log(e);
 
     if (!coinLeft.connected) {
 //      console.error('Please connect wallet', coinLeft)
-      message.error(`Please connect ${coinLeft.blockchain} wallet`)
-      return
+      message.error(`Please connect ${coinLeft.blockchain} wallet`);
+      return;
     }
     if (!coinRight.connected) {
 //      console.error('Please connect wallet', coinRight)
-      message.error(`Please connect ${coinRight.blockchain} wallet`)
-      return
+      message.error(`Please connect ${coinRight.blockchain} wallet`);
+      return;
     }
 
     if (ethContractError) {
       //      console.error('Please connect wallet', coinRight)
-      message.error(`ethContractError`)
-      return
+      message.error(`Contract error. Please check contract address configuration`);
+      return;
     }
 
     // make tx
     let o = {
       coinLeft,
       coinRight,
-      amountValue
-    }
+      amountValue,
+    };
 
-    console.log(JSON.stringify(o, null, 2))
+    console.log(JSON.stringify(o, null, 2));
     
     // make invoice
     // send invoice
 
-    orderAdd(o)
+    orderAdd(o);
   }
 
   // HANDLE EXCHANGE ORDER ]
@@ -616,25 +619,24 @@ function App(props) {
 
   async function handleOrderApplyClick(orderIndex, order) {
     if (order.reverse) {
-      return 
+      return;
     }
 
     if (!csprPrivKey) {
-      message.error(`Please input private key to apply cspr request`)
-      return
+      message.error(`Please input private key to apply cspr request`);
+      return;
     }
 
     let privkey = csprPrivKey;
 
-    let csprTx = await CasperHelper.applyArtifact({orderIndex, order, privkey})
-
+    let csprTx = await CasperHelper.applyArtifact({orderIndex, order, privkey});
 
     if (typeof csprTx !== 'string') {
-      message.error(`casper error ${csprTx.err}`)
-      return
+      message.error(`casper error ${csprTx.err}`);
+      return;
     }
 
-    console.log('apply eth order update', orderIndex, csprTx)
+    console.log('apply eth order update', orderIndex, csprTx);
 
     tx(writeContracts.YourContract.updateOrder(orderIndex, 1, csprTx));
   }
@@ -656,12 +658,12 @@ function App(props) {
 
   function coinAddressDisplay(coin) {
     if (!coin.connected)
-      return coin.address
+      return coin.address;
     if (coin.blockchain == 'Ethereum') {
       return coin.address;
     }
     // casper
-    return csprAddressDisplay(coin.address)
+    return csprAddressDisplay(coin.address);
   }
 
   function addressDisplay(address) {
@@ -1012,10 +1014,116 @@ function App(props) {
   // #####  **  #####
   // ################
 
-*/}
 
       <Switch>
         <Route exact path="/">
+        </Route>
+      </Switch>
+
+      <NetworkDisplay
+        NETWORKCHECK={NETWORKCHECK}
+        localChainId={localChainId}
+        selectedChainId={selectedChainId}
+        targetNetwork={targetNetwork}
+        logoutOfWeb3Modal={logoutOfWeb3Modal}
+        USE_NETWORK_SELECTOR={USE_NETWORK_SELECTOR}
+      />
+*/}
+
+      <Menu style={{ textAlign: "center", marginTop: 20 }} selectedKeys={[location.pathname]} mode="horizontal">
+        <Menu.Item key="/">
+          <Link to="/">App Home</Link>
+        </Menu.Item>
+        <Menu.Item key="/debug">
+          <Link to="/debug">Debug Contracts</Link>
+        </Menu.Item>
+        <Menu.Item key="/hints">
+          <Link to="/hints">Hints</Link>
+        </Menu.Item>
+        <Menu.Item key="/exampleui">
+          <Link to="/exampleui">ExampleUI</Link>
+        </Menu.Item>
+        <Menu.Item key="/mainnetdai">
+          <Link to="/mainnetdai">Mainnet DAI</Link>
+        </Menu.Item>
+        <Menu.Item key="/subgraph">
+          <Link to="/subgraph">Subgraph</Link>
+        </Menu.Item>
+      </Menu>
+
+      <Switch>
+        <Route exact path="/">
+          {/* pass in any web3 props to this Home component. For example, yourLocalBalance */}
+          <Home yourLocalBalance={yourLocalBalance} readContracts={readContracts} />
+        </Route>
+        <Route exact path="/debug">
+          {/*
+                🎛 this scaffolding is full of commonly used components
+                this <Contract/> component will automatically parse your ABI
+                and give you a form to interact with it locally
+            */}
+
+          <Contract
+            name="YourContract"
+            price={price}
+            signer={userSigner}
+            provider={localProvider}
+            address={address}
+            blockExplorer={blockExplorer}
+            contractConfig={contractConfig}
+          />
+        </Route>
+        <Route path="/hints">
+          <Hints
+            address={address}
+            yourLocalBalance={yourLocalBalance}
+            mainnetProvider={mainnetProvider}
+            price={price}
+          />
+        </Route>
+        <Route path="/exampleui">
+          <ExampleUI
+            address={address}
+            userSigner={userSigner}
+            mainnetProvider={mainnetProvider}
+            localProvider={localProvider}
+            yourLocalBalance={yourLocalBalance}
+            price={price}
+            tx={tx}
+            writeContracts={writeContracts}
+            readContracts={readContracts}
+            purpose={purpose}
+          />
+        </Route>
+        <Route path="/mainnetdai">
+          <Contract
+            name="DAI"
+            customContract={mainnetContracts && mainnetContracts.contracts && mainnetContracts.contracts.DAI}
+            signer={userSigner}
+            provider={mainnetProvider}
+            address={address}
+            blockExplorer="https://etherscan.io/"
+            contractConfig={contractConfig}
+            chainId={1}
+          />
+          {/*
+            <Contract
+              name="UNI"
+              customContract={mainnetContracts && mainnetContracts.contracts && mainnetContracts.contracts.UNI}
+              signer={userSigner}
+              provider={mainnetProvider}
+              address={address}
+              blockExplorer="https://etherscan.io/"
+            />
+            */}
+        </Route>
+        <Route path="/subgraph">
+          <Subgraph
+            subgraphUri={props.subgraphUri}
+            tx={tx}
+            writeContracts={writeContracts}
+            mainnetProvider={mainnetProvider}
+          />
         </Route>
       </Switch>
 

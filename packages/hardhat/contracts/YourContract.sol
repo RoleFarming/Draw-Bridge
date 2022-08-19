@@ -7,8 +7,6 @@ import "hardhat/console.sol";
 
 contract YourContract {
 
-  // event SetPurpose(address sender, string purpose);
-
   string public purpose = "Building Unstoppable Apps!!!";
 
   constructor() {
@@ -18,12 +16,12 @@ contract YourContract {
   function setPurpose(string memory newPurpose) public {
       purpose = newPurpose;
       console.log(msg.sender,"set purpose to",purpose);
-      // emit SetPurpose(msg.sender, purpose);
   }
 
+
   struct CasperAddress {
-//    uint256 high;
-//    uint256 low;
+    uint256 high; // for optimized version 2
+    uint256 low; // for optimized version 2
     string addr;
   }
 
@@ -43,8 +41,8 @@ contract YourContract {
   function addOrder(address account, uint256 csprHigh, uint256 csprLow, string memory csprHex, uint256 amount, bool reverse, string memory txid) public {
     Order memory order;
     order.eth = account;
-//    order.cspr.high = csprHigh;
-//    order.cspr.low = csprLow;
+    order.cspr.high = csprHigh; 
+    order.cspr.low = csprLow;
     order.cspr.addr = csprHex;
     order.amount = amount;
     order.reverse = reverse;
@@ -75,12 +73,4 @@ contract YourContract {
       }
     }
   }
-
-//  struct Orders {
-//    Order[] order;
-//  }
-
-//  mapping(address => CasperAddress) private orders1;
-//  mapping(address => Orders) private orders1;
-
 }

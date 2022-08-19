@@ -1,3 +1,19 @@
+export const SUPERVISOR = "0x3314b13a30747398d4c62FD1cadF152dB68D9bF4";
+
+// CASPER MAIN
+//const CASPER_CHAIN_NAME="casper-net-1" // mainnet
+
+// CASPER TEST
+export const CASPER_CHAIN_NAME="casper-test" // testnet
+export const CASPER_NODE_ADDRESS="http://138.201.54.44:7777/rpc"
+export const CASPER_EVENT_STREAM_ADDRESS="http://138.201.54.44:9999/events/main"
+export const CASPER_RFBTC_CONTRACT_HASH = '55ee24b578546688dfd0f3026cd5f8c2208f332b76b8017b75a62c6e0981b61b'
+
+// CASPER LOCAL
+//const CASPER_NODE_ADDRESS="http://localhost:11101/rpc"
+//const CASPER_EVENT_STREAM_ADDRESS="http://localhost:18101/events/main"
+
+
 // MY INFURA_ID, SWAP IN YOURS FROM https://infura.io/dashboard/ethereum
 export const INFURA_ID = "7b0e75d38d424750b92791477924d133";
 
