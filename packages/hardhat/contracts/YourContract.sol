@@ -22,8 +22,8 @@ contract YourContract {
   }
 
   struct CasperAddress {
-//    uint256 high; // for optimized version 2
-//    uint256 low; // for optimized version 2
+//    uint256 high; // architecture for optimized version 2
+//    uint256 low; // architecture for optimized version 2
     string addr;
   }
 
@@ -43,6 +43,7 @@ contract YourContract {
   function addOrder(address account, uint256 csprHigh, uint256 csprLow, string memory csprHex, uint256 amount, bool reverse, string memory txid) public {
     Order memory order;
     order.eth = account;
+    // see CasperAddress structure for details about this variable
 //    order.cspr.high = csprHigh; 
 //    order.cspr.low = csprLow;
     order.cspr.addr = csprHex;
