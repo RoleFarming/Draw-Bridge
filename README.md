@@ -1,10 +1,13 @@
 # DRAW_BRIDGE
 
 2022/08 19 August Update 
-+ Remove unused code
-+ licenses Apache 2.0
-+ Contribution Policies
 + Testing docs
++ Unit Tests
++ Bugfix Metamask Wallet connection
++ Remove unused code
++ Update code base to lastest scaffold-eth 
++ License Apache 2.0
++ Contribution Policies
 
 ### Key Features
 
