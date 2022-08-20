@@ -80,23 +80,25 @@ yarn start
 
 ## Testing step by step
 
-1. Install CORS for testing. 
+### Prepare
+
+1. Disable CORS check in Chrome for testing 
 
 DrawBridge is server less Web3 dApp and CORS should be configured by cloud housting like Vercel.app 
-To avoid CORS error please install Chrome Extension 'Allow CORS: Access-Control-Allow-Origin8' and then Toggle On it (or other extension if this not works, see https://stackoverflow.com/questions/3102819/disable-same-origin-policy-in-chrome).
+To avoid CORS error please install Chrome Extension 'Allow CORS: Access-Control-Allow-Origin8' and then Toggle On it (or other extension if this not works, see https://stackoverflow.com/questions/3102819/disable-same-origin-policy-in-chrome)
 
-Terms
+### Terms
 
 1. Supervisor
 
-Supervisor is ETH administration account who can approve exchange operation ETH to CSPR
+Supervisor is ETH administration account who can approve exchange operation ETH to Casper
 
 2. User
 
 User is client who want to produce exhange operation
 
 
-Testing sequence
+### Testing sequence
 
 0. You are need two browser User and Supervisor
 
